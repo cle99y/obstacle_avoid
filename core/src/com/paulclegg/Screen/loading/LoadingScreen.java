@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.paulclegg.Config.GameConfig;
 import com.paulclegg.ObstacleGame;
-import com.paulclegg.Screen.game.GameScreen;
+import com.paulclegg.Screen.menu.MenuScreen;
 import com.paulclegg.Util.GdxUtils;
 import com.paulclegg.assets.AssetDescriptors;
 
@@ -20,26 +20,23 @@ import com.paulclegg.assets.AssetDescriptors;
 public class LoadingScreen extends ScreenAdapter {
 
     // == constants ==
-    private static final Logger log = new Logger(LoadingScreen.class.getName(), Logger.DEBUG);
+    private static final Logger log = new Logger( LoadingScreen.class.getName(), Logger.DEBUG );
 
     private static final float PROGRESS_BAR_WIDTH = GameConfig.HUD_WIDTH / 2f; // world units
     private static final float PROGRESS_BAR_HEIGHT = 60; // world units
-
+    private final ObstacleGame game;
+    private final AssetManager assetManager;
     // == attributes ==
     private OrthographicCamera camera;
     private Viewport viewport;
     private ShapeRenderer renderer;
-
     private float progress;
     private float waitTime = 0.75f;
     private boolean changeScreen;
 
-    private final ObstacleGame game;
-    private final AssetManager assetManager;
-
 
     // == constructors ==
-    public LoadingScreen(ObstacleGame game) {
+    public LoadingScreen( ObstacleGame game ) {
         this.game = game;
         assetManager = game.getAssetManager();
     }
@@ -47,72 +44,74 @@ public class LoadingScreen extends ScreenAdapter {
     // == public methods ==
     @Override
     public void show() {
-        log.debug("show");
+        log.debug( "show" );
         camera = new OrthographicCamera();
-        viewport = new FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera);
+        viewport = new FitViewport( GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, camera );
         renderer = new ShapeRenderer();
 
-        assetManager.load(AssetDescriptors.UIFONT);
-        assetManager.load(AssetDescriptors.GAME_PLAY);
+        assetManager.load( AssetDescriptors.UIFONT );
+        assetManager.load( AssetDescriptors.GAME_PLAY );
+        assetManager.load( AssetDescriptors.UI );
+        assetManager.load( AssetDescriptors.UI_SKIN );
     }
 
     @Override
-    public void render(float delta) {
-        update(delta);
+    public void render( float delta ) {
+        update( delta );
 
         GdxUtils.clearScreen();
         viewport.apply();
-        renderer.setProjectionMatrix(camera.combined);
-        renderer.begin(ShapeRenderer.ShapeType.Filled);
+        renderer.setProjectionMatrix( camera.combined );
+        renderer.begin( ShapeRenderer.ShapeType.Filled );
 
         draw();
 
         renderer.end();
 
-        if(changeScreen) {
-            game.setScreen(new GameScreen(game));
+        if ( changeScreen ) {
+            game.setScreen( new MenuScreen( game ) );
         }
     }
 
     @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height, true);
+    public void resize( int width, int height ) {
+        viewport.update( width, height, true );
     }
 
     @Override
     public void hide() {
-        log.debug("hide");
-        // NOTE: screens dont dispose automatically
+        log.debug( "hide" );
+        // NOTE: screens don't dispose automatically
         dispose();
     }
 
     @Override
     public void dispose() {
-        log.debug("dispose");
+        log.debug( "dispose" );
         renderer.dispose();
         renderer = null;
     }
 
     // == private methods ==
-    private void update(float delta) {
+    private void update( float delta ) {
         // progress is between 0 and 1
         progress = assetManager.getProgress();
 
         // update returns true when all assets are loaded
-        if(assetManager.update()) {
+        if ( assetManager.update() ) {
             waitTime -= delta;
 
-            if(waitTime <= 0) {
+            if ( waitTime <= 0 ) {
                 changeScreen = true;
             }
         }
     }
 
     private void draw() {
-        float progressBarX = (GameConfig.HUD_WIDTH - PROGRESS_BAR_WIDTH) / 2f;
-        float progressBarY = (GameConfig.HUD_HEIGHT - PROGRESS_BAR_HEIGHT) / 2f;
+        float progressBarX = ( GameConfig.HUD_WIDTH - PROGRESS_BAR_WIDTH ) / 2f;
+        float progressBarY = ( GameConfig.HUD_HEIGHT - PROGRESS_BAR_HEIGHT ) / 2f;
 
-        renderer.rect(progressBarX, progressBarY,
+        renderer.rect( progressBarX, progressBarY,
                 progress * PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT
         );
     }

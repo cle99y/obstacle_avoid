@@ -31,37 +31,31 @@ public class GameRenderer implements Disposable {
 
     // attributes
 
-    private static final Logger log = new Logger(ViewportUtils.class.getName(), Logger.DEBUG);
-
+    private static final Logger log = new Logger( ViewportUtils.class.getName(), Logger.DEBUG );
+    private final GlyphLayout layout = new GlyphLayout();
+    private final SpriteBatch sb;
     private OrthographicCamera camera;
     private OrthographicCamera hudCamera;
-
     private ShapeRenderer renderer;
-
     private Viewport viewport;
     private Viewport hudViewport;
-
-    private SpriteBatch sb;
-    private final GlyphLayout layout = new GlyphLayout();
     private BitmapFont hudFont;
-
     private DebugCameraController debugCameraController;
-
     private GameController controller;
-
     private AssetManager assetManager;
 
     // Textures
-
     private TextureRegion playerRegion;
     private TextureRegion obstacleRegion;
     private TextureRegion backgroundRegion;
 
 
-    public GameRenderer(AssetManager am, GameController controller) {
+    public GameRenderer( SpriteBatch sb, AssetManager am, GameController controller ) {
 
         this.controller = controller;
         this.assetManager = am;
+        this.sb = sb;
+
         init();
     }
 
@@ -69,30 +63,30 @@ public class GameRenderer implements Disposable {
     private void init() {
 
         camera = new OrthographicCamera();
-        viewport = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera);
+        viewport = new FitViewport( GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera );
         renderer = new ShapeRenderer();
 
         hudCamera = new OrthographicCamera();
-        hudViewport = new FitViewport(GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, hudCamera);
-        hudFont = assetManager.get(AssetDescriptors.UIFONT);
-        sb = new SpriteBatch();
+        hudViewport = new FitViewport( GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT, hudCamera );
+
+        hudFont = assetManager.get( AssetDescriptors.UIFONT );
 
         debugCameraController = new DebugCameraController();
-        debugCameraController.setStartPosition(GameConfig.WORLD_CENTER_X, GameConfig.WORLD_CENTER_Y);
+        debugCameraController.setStartPosition( GameConfig.WORLD_CENTER_X, GameConfig.WORLD_CENTER_Y );
 
-        TextureAtlas gameplayAtlas = assetManager.get(AssetDescriptors.GAME_PLAY);
+        TextureAtlas gameplayAtlas = assetManager.get( AssetDescriptors.GAME_PLAY );
 
-        playerRegion = gameplayAtlas.findRegion(RegionNames.PLAYER);
-        obstacleRegion = gameplayAtlas.findRegion(RegionNames.OBSTACLE);
-        backgroundRegion = gameplayAtlas.findRegion(RegionNames.BACKGROUND);
+        playerRegion = gameplayAtlas.findRegion( RegionNames.PLAYER );
+        obstacleRegion = gameplayAtlas.findRegion( RegionNames.OBSTACLE );
+        backgroundRegion = gameplayAtlas.findRegion( RegionNames.BACKGROUND );
 
     }
     // public methods
 
-    public void render(float delta) {
+    public void render( float delta ) {
 
-        debugCameraController.handleDebugInput(delta);
-        debugCameraController.applyTo(camera);
+        debugCameraController.handleDebugInput( delta );
+        debugCameraController.applyTo( camera );
 
         // clear screen
         GdxUtils.clearScreen();
@@ -108,19 +102,16 @@ public class GameRenderer implements Disposable {
 
     }
 
-    public void resize(int width, int height) {
+    public void resize( int width, int height ) {
 
-        viewport.update(width, height, true);
-        hudViewport.update(width, height, true);
-        ViewportUtils.debugPixelPerUnit(viewport);
+        viewport.update( width, height, true );
+        hudViewport.update( width, height, true );
+        ViewportUtils.debugPixelPerUnit( viewport );
 
     }
 
     public void dispose() {
-
-        sb.dispose();
         renderer.dispose();
-        assetManager.dispose();
     }
 
     // private methods
@@ -128,7 +119,7 @@ public class GameRenderer implements Disposable {
     private void renderGamePlay() {
 
         viewport.apply();
-        sb.setProjectionMatrix(camera.combined);
+        sb.setProjectionMatrix( camera.combined );
         sb.begin();
 
         drawGamePlay();
@@ -139,7 +130,7 @@ public class GameRenderer implements Disposable {
     private void renderUI() {
 
         hudViewport.apply();
-        sb.setProjectionMatrix(hudCamera.combined);
+        sb.setProjectionMatrix( hudCamera.combined );
         sb.begin();
 
         drawUI();
@@ -151,45 +142,45 @@ public class GameRenderer implements Disposable {
     private void renderDebug() {
 
         viewport.apply();
-        renderer.setProjectionMatrix(camera.combined);
-        renderer.begin(ShapeRenderer.ShapeType.Line);
+        renderer.setProjectionMatrix( camera.combined );
+        renderer.begin( ShapeRenderer.ShapeType.Line );
 
         drawDebug();
 
         renderer.end();
 
-        ViewportUtils.drawGrid(viewport, renderer);
+        ViewportUtils.drawGrid( viewport, renderer );
     }
 
     private void drawGamePlay() {
 
-            //draw background
-            Background background = controller.getBackground();
-            sb.draw(backgroundRegion,
-                    background.getX(),
-                    background.getY(),
-                    background.getWidth(),
-                    background.getHeight()
-            );
+        //draw background
+        Background background = controller.getBackground();
+        sb.draw( backgroundRegion,
+                background.getX(),
+                background.getY(),
+                background.getWidth(),
+                background.getHeight()
+        );
 
-            // draw obstacles
-            for (Obstacle obstacle : controller.getObstacles()) {
-                sb.draw(obstacleRegion,
-                        obstacle.getX(),
-                        obstacle.getY(),
-                        obstacle.getWidth(),
-                        obstacle.getHeight()
-                );
-            }
-
-            // draw player
-            Player player = controller.getPlayer();
-            sb.draw(playerRegion,
-                    player.getX(),
-                    player.getY(),
-                    player.getWidth(),
-                    player.getHeight()
+        // draw obstacles
+        for ( Obstacle obstacle : controller.getObstacles() ) {
+            sb.draw( obstacleRegion,
+                    obstacle.getX(),
+                    obstacle.getY(),
+                    obstacle.getWidth(),
+                    obstacle.getHeight()
             );
+        }
+
+        // draw player
+        Player player = controller.getPlayer();
+        sb.draw( playerRegion,
+                player.getX(),
+                player.getY(),
+                player.getWidth(),
+                player.getHeight()
+        );
 
     }
 
@@ -198,14 +189,14 @@ public class GameRenderer implements Disposable {
         String livesText = "LIVES: " + controller.getLives();
         String scoreText = "SCORE: " + controller.getDisplayScore();
 
-        layout.setText(hudFont, livesText);
-        hudFont.draw(sb, livesText,
+        layout.setText( hudFont, livesText );
+        hudFont.draw( sb, livesText,
                 20,
                 GameConfig.HUD_HEIGHT - layout.height
         );
 
-        layout.setText(hudFont, scoreText);
-        hudFont.draw(sb, scoreText,
+        layout.setText( hudFont, scoreText );
+        hudFont.draw( sb, scoreText,
                 GameConfig.HUD_WIDTH - 20 - layout.width,
                 GameConfig.HUD_HEIGHT - layout.height
         );
@@ -214,10 +205,10 @@ public class GameRenderer implements Disposable {
 
     private void drawDebug() {
 
-        controller.getPlayer().drawDebug(renderer);
+        controller.getPlayer().drawDebug( renderer );
 
-        for (Obstacle obstacle : controller.getObstacles()) {
-            obstacle.drawDebug(renderer);
+        for ( Obstacle obstacle : controller.getObstacles() ) {
+            obstacle.drawDebug( renderer );
         }
 
     }

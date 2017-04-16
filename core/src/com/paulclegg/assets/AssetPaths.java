@@ -13,6 +13,8 @@ public class AssetPaths {
     public static final String BACKGROUND_TEXTURE = "Gameplay/background.png";
     public static final String GAME_PLAY = "Gameplay/gameplay.atlas";
 
+    public static final String UI = "ui/ui.atlas";
+    public static final String UI_SKIN = "ui/skin.json";
 
     private AssetPaths() {
     }

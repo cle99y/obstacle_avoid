@@ -1,9 +1,9 @@
 package com.paulclegg.Screen.game;
 
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Logger;
 import com.paulclegg.ObstacleGame;
+import com.paulclegg.Screen.menu.MenuScreen;
 import com.paulclegg.Util.ViewportUtils;
 
 /**
@@ -14,20 +14,18 @@ public class GameScreen implements Screen {
 
     // CONSTANTS
 
-    private static final Logger log = new Logger(ViewportUtils.class.getName(), Logger.DEBUG);
+    private static final Logger log = new Logger( ViewportUtils.class.getName(), Logger.DEBUG );
 
     // attributes
 
     private final ObstacleGame game;
-    private final AssetManager assetManager;
 
     GameController controller;
     GameRenderer gameRenderer;
 
-    public GameScreen(ObstacleGame game) {
+    public GameScreen( ObstacleGame game ) {
 
         this.game = game;
-        assetManager = game.getAssetManager();
 
     }
 
@@ -38,20 +36,25 @@ public class GameScreen implements Screen {
     public void show() {
 
         controller = new GameController();
-        gameRenderer = new GameRenderer(assetManager, controller);
+
+        gameRenderer = new GameRenderer( game.getSpriteBatch(), game.getAssetManager(), controller );
     }
 
     @Override
-    public void render(float delta) {
+    public void render( float delta ) {
 
-        controller.update(delta);
-        gameRenderer.render(delta);
+        controller.update( delta );
+        gameRenderer.render( delta );
+
+        if ( controller.isGameOver() ) {
+            game.setScreen( new MenuScreen( game ) );
+        }
     }
 
     @Override
-    public void resize(int width, int height) {
+    public void resize( int width, int height ) {
 
-        gameRenderer.resize(width, height);
+        gameRenderer.resize( width, height );
     }
 
     @Override
@@ -71,6 +74,5 @@ public class GameScreen implements Screen {
     public void dispose() {
 
         gameRenderer.dispose();
-        assetManager.dispose();
     }
 }

@@ -14,12 +14,12 @@ public class Background {
     public Background() {
     }
 
-    public void setPosition(float x, float y) {
+    public void setPosition( float x, float y ) {
         this.x = x;
         this.y = y;
     }
 
-    public void setSize(float width, float height) {
+    public void setSize( float width, float height ) {
         this.width = width;
         this.height = height;
     }

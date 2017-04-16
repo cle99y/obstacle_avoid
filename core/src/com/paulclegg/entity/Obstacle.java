@@ -15,18 +15,18 @@ public class Obstacle extends GameObject implements Pool.Poolable {
     private boolean collided;
 
     public Obstacle() {
-        super(GameConfig.OBSTACLE_BOUNDS_RADIUS);
-        setSize(GameConfig.OBSTACLE_SIZE, GameConfig.OBSTACLE_SIZE);
+        super( GameConfig.OBSTACLE_BOUNDS_RADIUS );
+        setSize( GameConfig.OBSTACLE_SIZE, GameConfig.OBSTACLE_SIZE );
     }
 
     public void update() {
-        setY(getY() - ySpeed);
+        setY( getY() - ySpeed );
     }
 
-    public boolean playerCollision(Player player) {
+    public boolean playerCollision( Player player ) {
         Circle playerBounds = player.getBounds();
         // check if playerBounds overlap obstacle bounds
-        boolean overlaps = Intersector.overlaps(playerBounds, getBounds());
+        boolean overlaps = Intersector.overlaps( playerBounds, getBounds() );
 
 //        if(overlaps) {
 //            collided = true;
@@ -42,7 +42,7 @@ public class Obstacle extends GameObject implements Pool.Poolable {
         return collided;
     }
 
-    public void setYSpeed(float ySpeed) {
+    public void setYSpeed( float ySpeed ) {
         this.ySpeed = ySpeed;
     }
 
