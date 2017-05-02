@@ -6,9 +6,9 @@ package com.paulclegg.Config;
 
 public enum DifficultyLevel {
 
-    EASY( GameConfig.EASY_OBSTACLE_SPEED ),
-    MEDIUM( GameConfig.MEDIUM_OBSTACLE_SPEED ),
-    HARD( GameConfig.HARD_OBSTACLE_SPEED );
+    EASY( GameConfig.EASY_SPEED ),
+    MEDIUM( GameConfig.MEDIUM_SPEED ),
+    HARD( GameConfig.HARD_SPEED );
 
     private final float obstacleSpeed;
 

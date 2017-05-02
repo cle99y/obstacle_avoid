@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -19,7 +20,8 @@ import com.paulclegg.Util.debug.DebugCameraController;
 import com.paulclegg.assets.AssetDescriptors;
 import com.paulclegg.assets.RegionNames;
 import com.paulclegg.entity.Background;
-import com.paulclegg.entity.Obstacle;
+import com.paulclegg.entity.Collider;
+import com.paulclegg.entity.Lanes;
 import com.paulclegg.entity.Player;
 
 
@@ -45,9 +47,10 @@ public class GameRenderer implements Disposable {
     private AssetManager assetManager;
 
     // Textures
-    private TextureRegion playerRegion;
-    private TextureRegion obstacleRegion;
+    private TextureRegion[] playerRegion = new TextureRegion[RegionNames.PLAYER.length];
+    private TextureRegion[] colliderRegion = new TextureRegion[RegionNames.COLLIDER.length];
     private TextureRegion backgroundRegion;
+    private TextureRegion lanesRegion;
 
 
     public GameRenderer( SpriteBatch sb, AssetManager am, GameController controller ) {
@@ -61,6 +64,8 @@ public class GameRenderer implements Disposable {
 
     // init method
     private void init() {
+
+        String[] police = RegionNames.PLAYER;
 
         camera = new OrthographicCamera();
         viewport = new FitViewport( GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera );
@@ -76,9 +81,18 @@ public class GameRenderer implements Disposable {
 
         TextureAtlas gameplayAtlas = assetManager.get( AssetDescriptors.GAME_PLAY );
 
-        playerRegion = gameplayAtlas.findRegion( RegionNames.PLAYER );
-        obstacleRegion = gameplayAtlas.findRegion( RegionNames.OBSTACLE );
+
+        for ( int i = 0; i < RegionNames.PLAYER.length; i++ ) {
+            playerRegion[i] = gameplayAtlas.findRegion( police[i] );
+        }
+
+        for ( int i = 0; i < RegionNames.COLLIDER.length; i++ ) {
+            colliderRegion[i] = gameplayAtlas.findRegion( RegionNames.COLLIDER[i] );
+        }
+
         backgroundRegion = gameplayAtlas.findRegion( RegionNames.BACKGROUND );
+        lanesRegion = gameplayAtlas.findRegion( RegionNames.LANES );
+
 
     }
     // public methods
@@ -156,26 +170,42 @@ public class GameRenderer implements Disposable {
 
         //draw background
         Background background = controller.getBackground();
-        sb.draw( backgroundRegion,
-                background.getX(),
-                background.getY(),
-                background.getWidth(),
-                background.getHeight()
-        );
+        Array<Lanes> lanes = controller.getLanes();
+
+
+            sb.draw( backgroundRegion,
+                    background.getX(),
+                    background.getY(),
+                    background.getWidth(),
+                    background.getHeight()
+            );
+
+        for ( Lanes lane: lanes) {
+            sb.draw (lanesRegion,
+                    lane.getX(),
+                    lane.getY(),
+                    lane.getWidth(),
+                    lane.getHeight()
+            );
+        }
+
+
+
 
         // draw obstacles
-        for ( Obstacle obstacle : controller.getObstacles() ) {
-            sb.draw( obstacleRegion,
-                    obstacle.getX(),
-                    obstacle.getY(),
-                    obstacle.getWidth(),
-                    obstacle.getHeight()
+        for ( Collider collider : controller.getObstacles() ) {
+            sb.draw( colliderRegion[collider.getColliderType()],
+                    collider.getX(),
+                    collider.getY(),
+                    collider.getWidth(),
+                    collider.getHeight()
             );
         }
 
         // draw player
+
         Player player = controller.getPlayer();
-        sb.draw( playerRegion,
+        sb.draw( playerRegion[player.getAnimator()],
                 player.getX(),
                 player.getY(),
                 player.getWidth(),
@@ -207,8 +237,8 @@ public class GameRenderer implements Disposable {
 
         controller.getPlayer().drawDebug( renderer );
 
-        for ( Obstacle obstacle : controller.getObstacles() ) {
-            obstacle.drawDebug( renderer );
+        for ( Collider collider : controller.getObstacles() ) {
+            collider.drawDebug( renderer );
         }
 
     }

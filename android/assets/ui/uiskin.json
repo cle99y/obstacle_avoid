@@ -1,7 +1,7 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
     "default-font": {
-      "file": "fonts/ui_font_32.fnt"
+      "file": "fonts/hud_32.fnt"
     }
   },
   "com.badlogic.gdx.graphics.Color": {
@@ -14,7 +14,7 @@
     "black": {
       "a": 1,
       "b": 0,
-       "g": 0,
+      "g": 0,
       "r": 0
     },
     "gray": {
@@ -22,7 +22,14 @@
       "b": 0.5,
       "g": 0.5,
       "r": 0.5
+    },
+    "red": {
+      "a": 0.6,
+      "b": 0,
+      "g": 0,
+      "r": 1
     }
+
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
     "default": {
@@ -31,7 +38,7 @@
       "font": "default-font",
       "fontColor": "white",
       "downFontColor": "black",
-      "overFontColor": "gray"
+      "overFontColor": "red"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
@@ -49,7 +56,7 @@
       "font": "default-font",
       "fontColor": "white",
       "downFontColor": "black",
-      "overFontColor": "gray"
+      "overFontColor": "red"
     }
   }
 }

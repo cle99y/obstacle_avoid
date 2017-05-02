@@ -8,8 +8,12 @@ public class RegionNames {
 
     // gameplay.atlas
     public static final String BACKGROUND = "background";
-    public static final String PLAYER = "player";
-    public static final String OBSTACLE = "obstacle";
+    public static final String UI_BACKGROUND = "uiBackground";
+    public static final String[] PLAYER = new String[]
+            {"player/1", "player/2", "player/3", "player/4"};
+    public static final String[] COLLIDER = new String[]
+            {"FordRed", "FordBlue", "AudiRed", "AudiGreen", "taxi", "viperRed", "viperGreen"};
+    public static final String LANES = "laneLines";
 
     // ui.atlas
     public static final String BACK = "back";

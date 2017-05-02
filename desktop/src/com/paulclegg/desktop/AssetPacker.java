@@ -27,6 +27,14 @@ public class AssetPacker {
                 "gameplay"
         );
 
+        // Police car animation
+        // pack gameplay textures
+        TexturePacker.process( settings,
+                ASSET_RAW_PATH + "/Gameplay/player",
+                ASSET_PATH + "/Gameplay/police",
+                "policeCar"
+        );
+
         // pack ui textures
         TexturePacker.process( settings,
                 ASSET_RAW_PATH + "/ui",

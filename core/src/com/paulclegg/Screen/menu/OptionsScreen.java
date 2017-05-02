@@ -1,20 +1,18 @@
 package com.paulclegg.Screen.menu;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Logger;
 import com.paulclegg.Config.DifficultyLevel;
-import com.paulclegg.Config.GameConfig;
 import com.paulclegg.ObstacleGame;
 import com.paulclegg.Util.ViewportUtils;
 import com.paulclegg.assets.AssetDescriptors;
@@ -29,100 +27,108 @@ public class OptionsScreen extends MenuBase {
 
     private static final Logger log = new Logger( ViewportUtils.class.getName(), Logger.DEBUG );
 
-    private Image checkMark;
+    private ButtonGroup<CheckBox> checkBoxGroup;
+    private CheckBox easy;
+    private CheckBox medium;
+    private CheckBox hard;
 
     public OptionsScreen( ObstacleGame game ) {
         super( game );
     }
 
+    private static CheckBox checkBox( String text, Skin skin ) {
+        CheckBox checkBox = new CheckBox( text, skin );
+        checkBox.left().pad( 10 );
+
+        checkBox.getLabelCell().pad( 10 );
+
+        return checkBox;
+
+    }
+
     @Override
     protected Actor createUI() {
+
         Table table = new Table();
 
-        TextureAtlas uiAtlas = assetManager.get( AssetDescriptors.UI );
+        Skin uiSkin = assetManager.get( AssetDescriptors.UI_SKIN );
         TextureAtlas gameplayAtlas = assetManager.get( AssetDescriptors.GAME_PLAY );
 
         TextureRegion backgroundRegion = gameplayAtlas.findRegion( RegionNames.BACKGROUND );
-        TextureRegion panelRegion = uiAtlas.findRegion( RegionNames.PANEL );
-        Image background = new Image( backgroundRegion );
-        background.setSize( GameConfig.HUD_WIDTH, GameConfig.HUD_HEIGHT );
+        table.setBackground( new TextureRegionDrawable( backgroundRegion ) );
 
-        BitmapFont uiFont = assetManager.get( AssetDescriptors.UIFONT );
-        Label.LabelStyle labelStyle = new Label.LabelStyle( uiFont, Color.WHITE );
+        Label label = new Label( "DIFFICULTY", uiSkin );
 
-        Label label = new Label( "DIFFICULTY", labelStyle );
-        label.setPosition( GameConfig.HUD_WIDTH / 2, GameConfig.HUD_HEIGHT / 2 + 180, Align.center );
+        easy = checkBox( DifficultyLevel.EASY.name(), uiSkin );
+        medium = checkBox( DifficultyLevel.MEDIUM.name(), uiSkin );
+        hard = checkBox( DifficultyLevel.HARD.name(), uiSkin );
 
-        // EASY button
-        final ImageButton easy = createButton( uiAtlas, RegionNames.EASY );
-        easy.setPosition( GameConfig.HUD_WIDTH / 2, GameConfig.HUD_HEIGHT / 2 + 90, Align.center );
-        easy.addListener( new ChangeListener() {
-            @Override
-            public void changed( ChangeEvent event, Actor actor ) {
-                log.debug( "easy" );
-                checkMark.setY( easy.getY() + 25 );
-                GameManager.INSTANCE.setDifficultyLevel( DifficultyLevel.EASY );
-            }
-        } );
+        checkBoxGroup = new ButtonGroup<CheckBox>( easy, medium, hard );
 
-        // MEDIUM button
-        final ImageButton medium = createButton( uiAtlas, RegionNames.MEDIUM );
-        medium.setPosition( GameConfig.HUD_WIDTH / 2, GameConfig.HUD_HEIGHT / 2, Align.center );
-        medium.addListener( new ChangeListener() {
-            @Override
-            public void changed( ChangeEvent event, Actor actor ) {
-                log.debug( "medium" );
-                checkMark.setY( medium.getY() + 25 );
-                GameManager.INSTANCE.setDifficultyLevel( DifficultyLevel.MEDIUM );
-
-            }
-        } );
-
-        // HARD button
-        final ImageButton hard = createButton( uiAtlas, RegionNames.HARD );
-        hard.setPosition( GameConfig.HUD_WIDTH / 2, GameConfig.HUD_HEIGHT / 2 - 90, Align.center );
-        hard.addListener( new ChangeListener() {
-            @Override
-            public void changed( ChangeEvent event, Actor actor ) {
-                log.debug( "hard" );
-                checkMark.setY( hard.getY() + 25 );
-                GameManager.INSTANCE.setDifficultyLevel( DifficultyLevel.HARD );
-
-            }
-        } );
-
-        final ImageButton back = createButton( uiAtlas, RegionNames.BACK, RegionNames.BACK_PRESSED );
-        back.setPosition( GameConfig.HUD_WIDTH / 2, GameConfig.HUD_HEIGHT / 2 - 180, Align.center );
-        back.addListener( new ChangeListener() {
-            @Override
-            public void changed( ChangeEvent event, Actor actor ) {
-                game.setScreen( new MenuScreen( game ) );
-            }
-        } );
-
-        TextureRegion checkMarkRegion = uiAtlas.findRegion( RegionNames.CHECK_MARK );
-        checkMark = new Image( new TextureRegionDrawable( checkMarkRegion ) );
-        checkMark.setPosition( medium.getX() + 50, medium.getY() + 40, Align.center );
-
+        // set default or current difficulty
         DifficultyLevel difficultyLevel = GameManager.INSTANCE.getDifficultyLevel();
-        if ( difficultyLevel.isEasy() ) {
-            checkMark.setPosition( easy.getX() + 50, easy.getY() + 40, Align.center );
-        } else if ( difficultyLevel.isHard() ) {
-            checkMark.setPosition( hard.getX() + 50, hard.getY() + 40, Align.center );
-        }
+        checkBoxGroup.setChecked( difficultyLevel.name() );
 
-        // add actors
+        // back button
+        TextButton backBtn = new TextButton( "BACK", uiSkin );
+        backBtn.addListener( new ChangeListener() {
+            @Override
+            public void changed( ChangeEvent event, Actor actor ) {
+                back();
+            }
+        } );
 
-        table.addActor( background );
-        table.addActor( label );
-        table.addActor( easy );
-        table.addActor( medium );
-        table.addActor( hard );
-        table.addActor( checkMark );
-        table.addActor( back );
+        // listener for checkboxes
+        ChangeListener difficultyListener = new ChangeListener() {
+            @Override
+            public void changed( ChangeEvent event, Actor actor ) {
+                difficultyChanged();
+            }
+        };
+
+        // add listener to each checkbox instance
+        easy.addListener( difficultyListener );
+        medium.addListener( difficultyListener );
+        hard.addListener( difficultyListener );
+
+        // set up table
+        Table highScoreTable = new Table( uiSkin );
+        highScoreTable.defaults().pad( 10 );
+        highScoreTable.setBackground( RegionNames.PANEL );
+
+        highScoreTable.add( label ).row();
+        highScoreTable.add( easy ).row();
+        highScoreTable.add( medium ).row();
+        highScoreTable.add( hard ).row();
+        highScoreTable.add( backBtn );
+
+        table.add( highScoreTable );
+        table.center();
+        table.setFillParent( true );
+        table.pack();
+
 
         return table;
 
+    }
+
+    private void back() {
+        log.debug( "back" );
+        game.setScreen( new MenuScreen( game ) );
+    }
+
+    private void difficultyChanged() {
+        log.debug( "difficulty changed" );
+
+        CheckBox checked = checkBoxGroup.getChecked();
+
+        if ( checked == easy ) {
+            GameManager.INSTANCE.setDifficultyLevel( DifficultyLevel.EASY );
+        } else if ( checked == medium ) {
+            GameManager.INSTANCE.setDifficultyLevel( DifficultyLevel.MEDIUM );
+        } else {
+            GameManager.INSTANCE.setDifficultyLevel( DifficultyLevel.HARD );
+        }
     }
 
 }

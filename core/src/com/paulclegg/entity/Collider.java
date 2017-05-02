@@ -1,8 +1,10 @@
 package com.paulclegg.entity;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.Pool;
 import com.paulclegg.Config.GameConfig;
 import com.paulclegg.Util.ViewportUtils;
 import com.paulclegg.assets.RegionNames;
@@ -11,8 +13,7 @@ import com.paulclegg.assets.RegionNames;
  * Created by cle99 on 03/04/2017.
  */
 
-
-public class Player {
+public class Collider implements Pool.Poolable {
 
     private static final Logger log = new Logger( ViewportUtils.class.getName(), Logger.DEBUG );
 
@@ -25,10 +26,22 @@ public class Player {
 
     private Rectangle bounds;
 
-    public Player() {
-        bounds = new Rectangle( x, y, GameConfig.PLAYER_WIDTH, GameConfig.PLAYER_LENGTH );
-        width = GameConfig.PLAYER_WIDTH;
-        height = GameConfig.PLAYER_LENGTH;
+    private float ySpeed = GameConfig.EASY_SPEED;
+    private boolean collided;
+    private int colliderType;
+
+    public Collider() {
+        bounds = new Rectangle( x, y, GameConfig.COLLIDER_WIDTH, GameConfig.COLLIDER_LENGTH );
+        width = GameConfig.COLLIDER_WIDTH;
+        height = GameConfig.COLLIDER_LENGTH;
+
+        //  the following assigns a collider type at random
+        colliderType = MathUtils.random( 0, RegionNames.COLLIDER.length - 1 );
+        log.debug( "collider type: " + colliderType );
+    }
+
+    public void update() {
+        setY( getY() - ySpeed );
     }
 
     public void setPosition( float x, float y ) {
@@ -49,15 +62,20 @@ public class Player {
         return width;
     }
 
+    public int getColliderType() {
+        return colliderType;
+    }
+
     public int getAnimator() {
         return animator;
     }
 
     public void updateAnimator() {
         animator++;
-        if (animator > RegionNames.PLAYER.length - 1) {
+        if ( animator > RegionNames.PLAYER.length - 1 ) {
             animator = 0;
         }
+
     }
 
     public float getHeight() {
@@ -75,6 +93,7 @@ public class Player {
 
     public void setY( float y ) {
         this.y = y;
+        updateBounds();
     }
 
     public void setSize( float width, float height ) {
@@ -89,5 +108,33 @@ public class Player {
 
     public void drawDebug( ShapeRenderer renderer ) {
         renderer.rect( bounds.x, bounds.y, bounds.getWidth(), bounds.getHeight() );
+    }
+
+    public boolean playerCollision( Player player ) {
+        Rectangle playerBounds = player.getBounds();
+        // check if playerBounds overlap obstacle bounds
+        boolean overlaps = playerBounds.overlaps( getBounds() );
+
+//        if(overlaps) {
+//            collided = true;
+//        }
+
+        // better way
+        collided = overlaps;
+
+        return collided;
+    }
+
+    public boolean isCollided() {
+        return collided;
+    }
+
+    public void setYSpeed( float ySpeed ) {
+        this.ySpeed = ySpeed;
+    }
+
+    public void reset() {
+        collided = false;
+        colliderType = MathUtils.random( 0, RegionNames.COLLIDER.length - 1 );
     }
 }

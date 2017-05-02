@@ -2,6 +2,7 @@ package com.paulclegg.entity;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Rectangle;
 
 /**
  * Created by cle99 on 04/04/2017.
@@ -11,13 +12,18 @@ public abstract class GameObject {
 
     private float x;
     private float y;
-    private float width = 1;
-    private float height = 1;
+    private float width;
+    private float height;
 
     private Circle bounds;
+    private Rectangle boundsR;
 
     public GameObject( float boundsRadius ) {
         bounds = new Circle( x, y, boundsRadius );
+    }
+
+    public GameObject() {
+        boundsR = new Rectangle();
     }
 
     public void drawDebug( ShapeRenderer renderer ) {

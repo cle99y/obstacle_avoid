@@ -4,12 +4,14 @@ package com.paulclegg.entity;
  * Created by cle99 on 06/04/2017.
  */
 
+
 public class Background {
 
     private float x;
     private float y;
     private float width;
     private float height;
+    private float ySpeed;
 
     public Background() {
     }
@@ -19,9 +21,17 @@ public class Background {
         this.y = y;
     }
 
+    public void update() {
+        y -= ySpeed;
+    }
+
     public void setSize( float width, float height ) {
         this.width = width;
         this.height = height;
+    }
+
+    public void setySpeed( float ySpeed ) {
+        this.ySpeed = ySpeed;
     }
 
     public float getX() {

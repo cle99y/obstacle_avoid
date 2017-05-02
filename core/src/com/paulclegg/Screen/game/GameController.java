@@ -12,7 +12,8 @@ import com.paulclegg.Config.GameConfig;
 import com.paulclegg.Util.ViewportUtils;
 import com.paulclegg.common.GameManager;
 import com.paulclegg.entity.Background;
-import com.paulclegg.entity.Obstacle;
+import com.paulclegg.entity.Collider;
+import com.paulclegg.entity.Lanes;
 import com.paulclegg.entity.Player;
 
 /**
@@ -27,20 +28,27 @@ public class GameController {
 
     // ATTRIBUTES
     private final float startPlayerX = ( GameConfig.WORLD_WIDTH - GameConfig.PLAYER_SIZE ) / 2f;
-    private final float startPlayerY = 1 - GameConfig.PLAYER_SIZE / 2f;
+    private final float startPlayerY = 2 - GameConfig.PLAYER_SIZE / 2f;
     private Player player;
-    private Array<Obstacle> obstacles = new Array<Obstacle>();
+
+    private Array<Collider> colliders = new Array<Collider>();
+    private Array<Lanes> lanes = new Array<Lanes>();
     private Background background;
-    private float obstacleTimer;
+
+    private float colliderTimer;
     private float scoreTimer;
+    private float animatorTimer;
+    private float gameTime;
     private int score;
     private int displayScore;
     private int lives = GameConfig.START_LIVES;
-    private Pool<Obstacle> obstaclePool;
+
+    private Pool<Collider> colliderPool;
 
     // CONSTRUCTOR
 
     public GameController() {
+
         init();
     }
 
@@ -50,16 +58,24 @@ public class GameController {
         // create player
         player = new Player();
 
+        background = new Background();
+        background.setPosition( 0, 0 );
+        background.setSize( GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT );
+
 
         // calculate position
 
         player.setPosition( startPlayerX, startPlayerY );
 
-        obstaclePool = Pools.get( Obstacle.class, 40 );
+        colliderPool = Pools.get( Collider.class, 40 );
 
-        background = new Background();
-        background.setPosition( 0, 0 );
-        background.setSize( GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT );
+        for ( int i = 0; i <= 7; i++ ) {
+            lanes.add( new Lanes() );
+            lanes.get( i ).setPosition( 0, i * GameConfig.WORLD_HEIGHT / 6f );
+
+
+        }
+
     }
 
     // public methods
@@ -72,11 +88,12 @@ public class GameController {
         }
 
         updatePlayer();
-        updateObstacles( delta );
+        updateBackground(delta);
+        updateColliders( delta );
         updateScore( delta );
         updateDisplayScore( delta );
 
-        if ( isPlayerCollidingWithObstacles() ) {
+        if ( isPlayerCollidingWithColliders() ) {
 
             lives--;
 
@@ -93,8 +110,12 @@ public class GameController {
         return player;
     }
 
-    public Array<Obstacle> getObstacles() {
-        return obstacles;
+    public Array<Collider> getObstacles() {
+        return colliders;
+    }
+
+    public Array<Lanes> getLanes() {
+        return lanes;
     }
 
     public Background getBackground() {
@@ -112,8 +133,8 @@ public class GameController {
     // private methods
 
     private void restart() {
-        obstaclePool.freeAll( obstacles );
-        obstacles.clear();
+        colliderPool.freeAll( colliders );
+        colliders.clear();
         player.setPosition( startPlayerX, startPlayerY );
 
     }
@@ -122,14 +143,26 @@ public class GameController {
         return lives <= 0;
     }
 
-    private boolean isPlayerCollidingWithObstacles() {
-        for ( Obstacle obstacle : obstacles ) {
-            if ( !obstacle.isCollided() && obstacle.playerCollision( player ) ) {
+    private boolean isPlayerCollidingWithColliders() {
+        for ( Collider collider : colliders ) {
+            if ( !collider.isCollided() && collider.playerCollision( player ) ) {
                 return true;
             }
         }
         return false;
     }
+
+    private void updateBackground( float delta ) {
+        for ( Lanes lane : lanes ) {
+            lane.update();
+            if ( lane.getY() < -lane.getHeight() ) {
+                lane.reset();
+            }
+            lane.setPosition( lane.getX(), lane.getY() );
+
+        }
+    }
+
 
     private void updatePlayer() {
 
@@ -152,47 +185,74 @@ public class GameController {
 
         player.setPosition( playerX, player.getY() );
 
-    }
-
-    private void updateObstacles( float delta ) {
-        for ( Obstacle obstacle : obstacles ) {
-            obstacle.update();
+        // set animation parameters
+        float dT = Gdx.graphics.getDeltaTime();
+        animatorTimer += dT;
+        if ( animatorTimer >= GameConfig.POLICE_ANIMATION_SPEED ) {
+            // update the animator index after speficied period elapsed
+            player.updateAnimator();
+            animatorTimer = 0f;  //reset animator timer
         }
-        createNewObstacle( delta );
-        removePassedObstacles();  // remove obstacles that have passed off screen
+
     }
 
-    private void createNewObstacle( float delta ) {
-        obstacleTimer += delta;
+    private void updateColliders( float delta ) {
+        for ( Collider collider : colliders ) {
+            collider.update();
+        }
+        createNewObject( delta );
+        removePassedObjects();  // remove obstacles that have passed off screen
+    }
 
-        if ( obstacleTimer >= GameConfig.OBSTACLE_SPAWN_TIME ) {
+    private void createNewObject( float delta ) {
+        float speedModifier;
+        colliderTimer += delta;
+
+        if ( colliderTimer >= GameConfig.OBSTACLE_SPAWN_TIME ) {
             float min = 0.0f;
-            float max = GameConfig.WORLD_WIDTH - GameConfig.OBSTACLE_SIZE;
+            float max = GameConfig.WORLD_WIDTH - GameConfig.COLLIDER_SIZE;
 
-            float obstacleX = MathUtils.random( min, max );
+            float obstacleX = getObstacleX();
             float obstacleY = GameConfig.WORLD_HEIGHT;
 
-            Obstacle obstacle = obstaclePool.obtain();
+            Collider collider = colliderPool.obtain();
             DifficultyLevel difficultyLevel = GameManager.INSTANCE.getDifficultyLevel();
-            obstacle.setYSpeed( difficultyLevel.getObstacleSpeed() );
-            obstacle.setPosition( obstacleX, obstacleY );
+            speedModifier = getSpeedMultiplier( obstacleX, max - min );
 
-            obstacles.add( obstacle );
-            obstacleTimer = 0.0f;
+            collider.setPosition( obstacleX, obstacleY );
+            collider.setYSpeed( difficultyLevel.getObstacleSpeed() * speedModifier );
+
+            colliders.add( collider );
+            colliderTimer = 0.0f;
         }
     }
 
+    private float getObstacleX() {
+        float lane = MathUtils.random( 0, 5 );
+        float laneWidth = GameConfig.WORLD_WIDTH / 6f;
+        float margin = ( laneWidth - GameConfig.COLLIDER_SIZE ) / 2;
+        return lane + margin;
+    }
 
-    private void removePassedObstacles() {
-        if ( obstacles.size > 0 ) {
-            Obstacle first = obstacles.first();
 
-            float minObstacleY = -GameConfig.OBSTACLE_SIZE;
+    private void removePassedObjects() {
+        if ( colliders.size > 0 ) {
+            float minObstacleY = -GameConfig.COLLIDER_SIZE;
+            for ( Collider collider : colliders ) {
 
-            if ( first.getY() < minObstacleY ) {
-                obstacles.removeValue( first, true );
-                obstaclePool.free( first );
+                if ( collider.getY() < minObstacleY ) {
+                    colliders.removeValue( collider, true );
+                    colliderPool.free( collider );
+                }
+
             }
+            // TODO delete code below when modified code above tested
+//            Collider first = colliders.first();
+//            float minObstacleY = -GameConfig.OBSTACLE_SIZE;
+//            if ( first.getY() < minObstacleY ) {
+//                colliders.removeValue( first, true );
+//                colliderPool.free( first );
+//            }
         }
     }
 
@@ -219,12 +279,19 @@ public class GameController {
 
     }
 
-//    private float getSpeedMultiplier(float delta, float x) {
-//        gameTime += delta ;
-//        float xRange = x / GameConfig.WORLD_WIDTH * 2 * (float) Math.PI;
-//        float radian =  gameTime / (2f * (float) Math.PI) + xRange;
-//
-//        return (float) Math.sin(radian);
-//    }
+    private float getSpeedMultiplier( float x, float availableWidth ) {
+        final float TWO_PI = 2f * ( float ) Math.PI;
+        float dT = Gdx.graphics.getDeltaTime() * 5;
+        gameTime = gameTime + dT;
+
+        // convert position x to radians (determined as position / screenwidth * 2* Pi
+        float xRange = x / availableWidth * TWO_PI;
+
+        float radian = gameTime + xRange;
+
+        // return float between 0.0 and 1.0
+        float sineFunction = ( 1 + ( float ) Math.sin( radian ) ) / 2;
+        return 1 + sineFunction / 3;
+    }
 
 }
