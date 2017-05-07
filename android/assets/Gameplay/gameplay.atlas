@@ -1,0 +1,214 @@
+
+gameplay.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Ambulance
+  rotate: false
+  xy: 2, 52
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+AudiGreen
+  rotate: false
+  xy: 376, 94
+  size: 98, 214
+  orig: 98, 214
+  offset: 0, 0
+  index: -1
+AudiRed
+  rotate: false
+  xy: 724, 910
+  size: 98, 214
+  orig: 98, 214
+  offset: 0, 0
+  index: -1
+AudiRedPurple
+  rotate: false
+  xy: 840, 1136
+  size: 98, 214
+  orig: 98, 214
+  offset: 0, 0
+  index: -1
+Car
+  rotate: false
+  xy: 724, 693
+  size: 92, 215
+  orig: 92, 215
+  offset: 0, 0
+  index: -1
+FordBlue
+  rotate: false
+  xy: 724, 693
+  size: 92, 215
+  orig: 92, 215
+  offset: 0, 0
+  index: -1
+FordBlueGreen
+  rotate: false
+  xy: 724, 476
+  size: 92, 215
+  orig: 92, 215
+  offset: 0, 0
+  index: -1
+FordRed
+  rotate: false
+  xy: 476, 93
+  size: 92, 215
+  orig: 92, 215
+  offset: 0, 0
+  index: -1
+FordYellowGreen
+  rotate: false
+  xy: 570, 93
+  size: 92, 215
+  orig: 92, 215
+  offset: 0, 0
+  index: -1
+Police
+  rotate: false
+  xy: 1411, 1796
+  size: 98, 214
+  orig: 98, 214
+  offset: 0, 0
+  index: -1
+background
+  rotate: false
+  xy: 2, 730
+  size: 720, 1280
+  orig: 720, 1280
+  offset: 0, 0
+  index: -1
+collider
+  rotate: false
+  xy: 2, 2
+  size: 48, 48
+  orig: 48, 48
+  offset: 0, 0
+  index: -1
+laneLines
+  rotate: false
+  xy: 2, 310
+  size: 720, 418
+  orig: 720, 418
+  offset: 0, 0
+  index: -1
+player
+  rotate: false
+  xy: 1126, 1676
+  size: 48, 42
+  orig: 48, 42
+  offset: 0, 0
+  index: -1
+rainbowTaxi
+  rotate: false
+  xy: 260, 84
+  size: 114, 224
+  orig: 114, 224
+  offset: 0, 0
+  index: -1
+shadow
+  rotate: false
+  xy: 1126, 1720
+  size: 180, 290
+  orig: 180, 290
+  offset: 0, 0
+  index: -1
+taxi
+  rotate: false
+  xy: 724, 1126
+  size: 114, 224
+  orig: 114, 224
+  offset: 0, 0
+  index: -1
+truck
+  rotate: false
+  xy: 724, 1352
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+uiBackground
+  rotate: false
+  xy: 724, 1610
+  size: 400, 400
+  orig: 400, 400
+  offset: 0, 0
+  index: -1
+viperGreen
+  rotate: false
+  xy: 982, 1392
+  size: 101, 216
+  orig: 101, 216
+  offset: 0, 0
+  index: -1
+viperRed
+  rotate: false
+  xy: 1308, 1794
+  size: 101, 216
+  orig: 101, 216
+  offset: 0, 0
+  index: -1
+
+gameplay2.png
+size: 1024,512
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+ambulance_animation/1
+  rotate: false
+  xy: 2, 2
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+ambulance_animation/2
+  rotate: false
+  xy: 260, 2
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+ambulance_animation/3
+  rotate: false
+  xy: 518, 2
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1
+
+gameplay3.png
+size: 512,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+player/1
+  rotate: false
+  xy: 2, 2
+  size: 98, 214
+  orig: 98, 214
+  offset: 0, 0
+  index: -1
+player/2
+  rotate: false
+  xy: 102, 2
+  size: 98, 214
+  orig: 98, 214
+  offset: 0, 0
+  index: -1
+player/4
+  rotate: false
+  xy: 102, 2
+  size: 98, 214
+  orig: 98, 214
+  offset: 0, 0
+  index: -1
+player/3
+  rotate: false
+  xy: 202, 2
+  size: 98, 214
+  orig: 98, 214
+  offset: 0, 0
+  index: -1

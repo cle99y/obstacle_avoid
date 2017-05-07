@@ -6,8 +6,9 @@ package com.paulclegg.entity;
 
 public enum ObjectType {
 
-    OBSTACLE,
+    CRIME,
     HEALTH,
+    INVINCIBILITY,
     POINTS;
 
 //    private final float spawnTime;
@@ -16,8 +17,8 @@ public enum ObjectType {
 //        this.spawnTime = spawnTime;
 //    }
 
-    public boolean isObstacle() {
-        return this == OBSTACLE;
+    public boolean isCrime() {
+        return this == CRIME;
     }
 
     public boolean isHealth() {
@@ -35,7 +36,7 @@ public enum ObjectType {
         } else if ( isPoints() ) {
             return POINTS;
         } else {
-            return OBSTACLE;
+            return CRIME;
         }
     }
 

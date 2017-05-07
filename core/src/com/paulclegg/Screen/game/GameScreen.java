@@ -35,7 +35,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
 
-        controller = new GameController();
+        controller = new GameController(game);
 
         gameRenderer = new GameRenderer( game.getSpriteBatch(), game.getAssetManager(), controller );
     }

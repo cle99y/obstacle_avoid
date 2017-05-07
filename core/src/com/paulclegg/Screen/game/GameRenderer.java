@@ -22,7 +22,7 @@ import com.paulclegg.assets.RegionNames;
 import com.paulclegg.entity.Background;
 import com.paulclegg.entity.Collider;
 import com.paulclegg.entity.Lanes;
-import com.paulclegg.entity.Player;
+import com.paulclegg.entity.PlayerSprite;
 
 
 /**
@@ -51,6 +51,7 @@ public class GameRenderer implements Disposable {
     private TextureRegion[] colliderRegion = new TextureRegion[RegionNames.COLLIDER.length];
     private TextureRegion backgroundRegion;
     private TextureRegion lanesRegion;
+    private TextureRegion shadow;
 
 
     public GameRenderer( SpriteBatch sb, AssetManager am, GameController controller ) {
@@ -92,6 +93,7 @@ public class GameRenderer implements Disposable {
 
         backgroundRegion = gameplayAtlas.findRegion( RegionNames.BACKGROUND );
         lanesRegion = gameplayAtlas.findRegion( RegionNames.LANES );
+        shadow = gameplayAtlas.findRegion( RegionNames.SHADOW );
 
 
     }
@@ -112,8 +114,9 @@ public class GameRenderer implements Disposable {
         renderUI();
 
         // render graphics
-        renderDebug();
-
+        if ( controller.debug ) {
+            renderDebug();
+        }
     }
 
     public void resize( int width, int height ) {
@@ -173,15 +176,15 @@ public class GameRenderer implements Disposable {
         Array<Lanes> lanes = controller.getLanes();
 
 
-            sb.draw( backgroundRegion,
-                    background.getX(),
-                    background.getY(),
-                    background.getWidth(),
-                    background.getHeight()
-            );
+        sb.draw( backgroundRegion,
+                background.getX(),
+                background.getY(),
+                background.getWidth(),
+                background.getHeight()
+        );
 
-        for ( Lanes lane: lanes) {
-            sb.draw (lanesRegion,
+        for ( Lanes lane : lanes ) {
+            sb.draw( lanesRegion,
                     lane.getX(),
                     lane.getY(),
                     lane.getWidth(),
@@ -190,10 +193,14 @@ public class GameRenderer implements Disposable {
         }
 
 
-
-
         // draw obstacles
         for ( Collider collider : controller.getObstacles() ) {
+            sb.draw( shadow,
+                    collider.getX() + 0.2f,
+                    collider.getY() + 0.1f,
+                    collider.getWidth(),
+                    collider.getHeight()
+            );
             sb.draw( colliderRegion[collider.getColliderType()],
                     collider.getX(),
                     collider.getY(),
@@ -204,13 +211,20 @@ public class GameRenderer implements Disposable {
 
         // draw player
 
-        Player player = controller.getPlayer();
-        sb.draw( playerRegion[player.getAnimator()],
-                player.getX(),
-                player.getY(),
+        PlayerSprite player = controller.getPlayer();
+        //TODO - make a shadow generator function
+        sb.draw( shadow,
+                player.getX() + 0.1f,
+                player.getY() + 0.1f,
                 player.getWidth(),
                 player.getHeight()
         );
+        player.draw( sb );
+//                player.getX(),
+//                player.getY(),
+//                player.getWidth(),
+//                player.getHeight()
+//        );
 
     }
 

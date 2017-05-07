@@ -17,6 +17,8 @@ public class Collider implements Pool.Poolable {
 
     private static final Logger log = new Logger( ViewportUtils.class.getName(), Logger.DEBUG );
 
+    public static final float TRUCK_SCALE = 1.2f;
+
     private float x;
     private float y;
     private float width;
@@ -26,18 +28,21 @@ public class Collider implements Pool.Poolable {
 
     private Rectangle bounds;
 
-    private float ySpeed = GameConfig.EASY_SPEED;
+    private float ySpeed;
+    private float initialSpeed;
     private boolean collided;
     private int colliderType;
 
     public Collider() {
-        bounds = new Rectangle( x, y, GameConfig.COLLIDER_WIDTH, GameConfig.COLLIDER_LENGTH );
+        colliderType = MathUtils.random( 0, RegionNames.COLLIDER.length - 1 );
+
         width = GameConfig.COLLIDER_WIDTH;
         height = GameConfig.COLLIDER_LENGTH;
 
-        //  the following assigns a collider type at random
-        colliderType = MathUtils.random( 0, RegionNames.COLLIDER.length - 1 );
-        log.debug( "collider type: " + colliderType );
+        ySpeed = getInitialSpeed();
+
+        bounds = new Rectangle( x, y, GameConfig.COLLIDER_WIDTH, GameConfig.COLLIDER_LENGTH );
+
     }
 
     public void update() {
@@ -56,6 +61,22 @@ public class Collider implements Pool.Poolable {
 
     public float getY() {
         return y;
+    }
+
+    public void setYSpeed(float speed){
+        ySpeed = speed;
+    }
+
+    public float getYSpeed() {
+        return ySpeed;
+    }
+
+    public void setInitialSpeed(float initialSpeed) {
+        this.initialSpeed = initialSpeed;
+    }
+
+    public float getInitialSpeed() {
+        return initialSpeed;
     }
 
     public float getWidth() {
@@ -127,10 +148,6 @@ public class Collider implements Pool.Poolable {
 
     public boolean isCollided() {
         return collided;
-    }
-
-    public void setYSpeed( float ySpeed ) {
-        this.ySpeed = ySpeed;
     }
 
     public void reset() {
